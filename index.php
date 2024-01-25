@@ -1,5 +1,5 @@
 <?php
-	$key = "sk-xxx";
+    $key = "sk-xxx";
     $org = "org-FUOhDblZb1pxvaY6YylF54gl";
     $url = 'https://api.openai.com/v1/images/generations';  
     
@@ -8,16 +8,10 @@
         "OpenAI-Organization: " . $org, 
         "Content-Type: application/json"
     ];
-  
-    $messages = [];
-    $obj = [];
-    $obj["role"] = "user";
-    $obj["content"] = "A picture depicting Easter.";
-   	$messages[] = $obj;
     	
     $data = [];
     $data["model"] = "dall-e-2";
-    $data["prompt"] = "A picture depicting Easter.";
+    $data["prompt"] = "A picture of Easter eggs.";
     $data["n"] = 1;
     $data["size"] = "1024x1024";
     $data["response_format"] = "url";
@@ -115,7 +109,8 @@
 			<div id="timeContainer">
 				<h2>{{message}}</h2>
 				<h1>{{seconds}}</h1>
-				<button v-on:click="reset">{{btnText}}</button>
+				<button v-on:click="reset(0)">{{btnText}}</button>
+				<button v-on:click="refresh">NEW IMAGE</button>
 			</div>
 
 			<div id="puzzleContainer" v-bind:class="checkIncorrectPieces() == 0 ? 'win' : ''">
@@ -144,13 +139,19 @@
 					},
 					methods:
 					{
-						reset: function()
+						refresh: function()
+						{
+							this.message = "Please wait while new image loads...";
+							this.stopTimer();
+							window.location.reload();
+						},
+						reset: function(delay)
 						{
 							this.stopTimer();
 							this.seconds = 100;
 							this.btnText = "RESET";
-							this.message = "Time elapsed";
-							this.startTimer();
+							this.message = "Please wait while image loads...";
+							this.startTimer(delay);
 							this.pieces = [];
 
 							for (var row = 0; row < 5; row++)
@@ -173,31 +174,39 @@
 								}
 							}
 						},
-						startTimer: function()
+						startTimer: function(delay)
 						{
 							if (this.timer == undefined)
 							{
-								this.timer = setInterval
+								setTimeout
 								(
-									() => 
+									() =>
 									{
-										this.seconds = this.seconds - 1;
+										this.timer = setInterval
+										(
+											() => 
+											{
+												this.seconds = this.seconds - 1;
+												this.message = "Time elapsed";
 
-										if (this.seconds == 0)
-										{
-											this.stopTimer();
-											this.btnText = "REPLAY";
-											this.message = "Better luck next time!";
-										}
+												if (this.seconds == 0)
+												{
+													this.stopTimer();
+													this.btnText = "REPLAY";
+													this.message = "Better luck next time!";
+												}
 
-										if (this.checkIncorrectPieces() == 0)
-										{
-											this.stopTimer();
-											this.btnText = "REPLAY";
-											this.message = "Congratulations!";
-										}
+												if (this.checkIncorrectPieces() == 0)
+												{
+													this.stopTimer();
+													this.btnText = "REPLAY";
+													this.message = "Congratulations!";
+												}
+											},
+											1000
+										);
 									},
-									1000
+									delay
 								);
 							}
 						},
@@ -240,7 +249,7 @@
 					},
 					created: function()
 					{
-						this.reset();
+						this.reset(5000);
 					}
 				}
 			);
