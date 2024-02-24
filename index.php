@@ -3,7 +3,8 @@
     $org = "org-FUOhDblZb1pxvaY6YylF54gl";
     $url = 'https://api.openai.com/v1/images/generations';  
     
-    $headers = [
+    $headers = 
+    [
         "Authorization: Bearer " . $key,
         "OpenAI-Organization: " . $org, 
         "Content-Type: application/json"
@@ -22,11 +23,12 @@
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-    if (curl_errno($curl)) {
+    $result = curl_exec($curl);
+    if (curl_errno($curl)) 
+    {
         echo 'Error:' . curl_error($curl);
     } 
 
-    $result = curl_exec($curl);
     $result = json_decode($result);
     $imgeURL = $result->data[0]->url;
     
